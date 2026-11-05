@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapCut AI Web Editor - Automation & Kinetic Effects</title>
+    <style>
+        :root {
+            --bg-dark: #0d0d12;
+            --panel-bg: #161620;
+            --panel-border: #262636;
+            --accent-blue: #00f2fe;
+            --accent-pink: #ff0055;
+            --accent-purple: #7928ca;
+            --text-main: #ffffff;
+            --text-muted: #8a8aa0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        header {
+            height: 50px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-blue);
+        }
+
+        /* Main Workspace Split */
+        .workspace {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 250px);
+            overflow: hidden;
+        }
+
+        /* Left Sidebar: Controls & AI Prompt */
+        .sidebar {
+            width: 340px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .section-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 90px;
+            background: #0a0a0f;
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            color: #fff;
+            padding: 8px;
+            font-size: 0.85rem;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: #2a2a3c;
+            color: #fff;
+            margin-top: 6px;
+        }
+
+        .sfx-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .sfx-btn {
+            background: #202030;
+            border: 1px solid var(--panel-border);
+            color: #ccc;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .sfx-btn:hover {
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        /* Center Video Preview */
+        .preview-area {
+            flex: 1;
+            background: #08080c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        .player-wrapper {
+            width: 290px;
+            height: 515px;
+            background: #000;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 2px solid #222;
+        }
+
+        canvas#videoCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Dynamic Kinetic Text Overlay */
+        .overlay-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Bottom Timeline Area */
+        .timeline-container {
+            height: 200px;
+            background: var(--panel-bg);
+            border-top: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timeline-toolbar {
+            height: 40px;
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            background: #111118;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .time-display {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+        }
+
+        .timeline-tracks {
+            flex: 1;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-top: 25px;
+            background: #0e0e14;
+        }
+
+        /* Scrubber / Playhead */
+        .playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-pink);
+            z-index: 100;
+            pointer-events: none;
+            left: 100px; /* Offset start */
+        }
+
+        .playhead-head {
+            position: absolute;
+            top: 0;
+            left: -6px;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-pink);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+
+        /* Individual Track Rows */
+        .track {
+            height: 36px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .track-label {
+            position: sticky;
+            left: 0;
+            width: 90px;
+            height: 100%;
+            background: #181824;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            z-index: 10;
+            border-right: 1px solid var(--panel-border);
+            color: var(--text-muted);
+        }
+
+        .track-content {
+            position: relative;
+            height: 100%;
+            flex: 1;
+            width: 2000px; /* Extended timeline length */
+        }
+
+        .clip {
+            position: absolute;
+            height: 28px;
+            top: 4px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .clip.video { background: #2b5c8f; }
+        .clip.motion { background: #8e24aa; }
+        .clip.text { background: #d81b60; }
+        .clip.sfx { background: #43a047; }
+
+        .clip.active {
+            outline: 2px solid var(--accent-blue);
+        }
+
+        /* Inspector Modal / Panel */
+        .inspector-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1c1c28;
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 20px;
+            width: 320px;
+            z-index: 1000;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+
+        .inspector-modal h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--accent-blue);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 6px;
+            background: #0a0a0f;
+            border: 1px solid var(--panel-border);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            ⚡ CapCut AI Web Studio
+        </div>
+        <div style="font-size:0.85rem; color: var(--text-muted)">
+            Auto Motion • Kinetic Captions • B-Roll SFX Engine
+        </div>
+    </header>
+
+    <!-- Workspace Main -->
+    <div class="workspace">
+
+        <!-- Left Panel: Prompt & Tools -->
+        <div class="sidebar">
+            <div class="section-box">
+                <div class="section-title">✨ AI Automation Prompt</div>
+                <textarea id="aiPrompt" placeholder="Contoh: Analisis video ini, buatkan efek motion zoom pada kata penting, tambahkan teks kinetik neon 'TRAFIK TINGGI!' dan 'MONETISASI = 0?', sertakan SFX Swoosh dan Pop.">Analisis video, buatkan teks kinetik neon "TRAFIK TINGGI!", "MONETISASI = 0?", "90% KENAL AI", efek zoom-in pada poin penting, serta SFX swoosh saat teks muncul.</textarea>
+                <button class="btn" onclick="generateAutoEdit()">⚡ Generate Edit Otomatis</button>
+            </div>
+
+            <div class="section-box">
+                <div class="section-title">🔊 Sound Effects (SFX) Input</div>
+                <div class="sfx-grid">
+                    <button class="sfx-btn" onclick="addSFXClip('Swoosh')">💨 Swoosh</button>
+                    <button class="sfx-btn" onclick="addSFXClip('Pop')">🎈 Pop Marker</button>
+                    <button class="sfx-btn" onclick="addSFXClip('Coin')">🔔 Cash/Coin</button>
+                    <button class="sfx-btn" onclick="addSFXClip('Camera')">📸 Camera Flash</button>
+                </div>
+                <button class="btn btn-secondary" onclick="triggerCustomSFXUpload()">📁 Upload File SFX (.wav/mp3)</button>
+                <input type="file" id="sfxFileInput" style="display:none" accept="audio/*" onchange="handleSFXUpload(event)">
+            </div>
+
+            <div class="section-box">
+                <div class="section-title">🔤 Manual Elements</div>
+                <button class="btn btn-secondary" onclick="addTextClip()">+ Tambah Teks Kinetik</button>
+            </div>
+        </div>
+
+        <!-- Center: Video Preview Canvas -->
+        <div class="preview-area">
+            <div class="player-wrapper">
+                <canvas id="videoCanvas" width="360" height="640"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Panel: Multi-track Timeline -->
+    <div class="timeline-container">
+        <div class="timeline-toolbar">
+            <div class="controls">
+                <button class="icon-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                <button class="icon-btn" onclick="stopVideo()">⏹</button>
+                <span class="time-display" id="timeDisplay">00:00.00 / 00:15.00</span>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted)">
+                Klik klip pada timeline untuk mengedit teks/durasi/efek
+            </div>
+        </div>
+
+        <div class="timeline-tracks" id="timelineTracks" onclick="seekTimeline(event)">
+            <div class="playhead" id="playhead">
+                <div class="playhead-head"></div>
+            </div>
+
+            <!-- Track 1: Video Footage -->
+            <div class="track">
+                <div class="track-label">🎬 Video</div>
+                <div class="track-content" id="track-video"></div>
+            </div>
+
+            <!-- Track 2: Motion Effects -->
+            <div class="track">
+                <div class="track-label">⚡ Motion</div>
+                <div class="track-content" id="track-motion"></div>
+            </div>
+
+            <!-- Track 3: Text & Captions -->
+            <div class="track">
+                <div class="track-label">🔤 Text/B-Roll</div>
+                <div class="track-content" id="track-text"></div>
+            </div>
+
+            <!-- Track 4: Audio & SFX -->
+            <div class="track">
+                <div class="track-label">🔊 SFX</div>
+                <div class="track-content" id="track-sfx"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Property Modal for Editing Clips -->
+    <div class="inspector-modal" id="clipInspector">
+        <h3 id="inspectorTitle">Edit Klip</h3>
+        <div class="form-group" id="textGroup">
+            <label>Konten Teks</label>
+            <input type="text" id="inspectorText" onchange="updateSelectedClip()">
+        </div>
+        <div class="form-group">
+            <label>Waktu Mulai (detik)</label>
+            <input type="number" step="0.1" id="inspectorStart" onchange="updateSelectedClip()">
+        </div>
+        <div class="form-group">
+            <label>Durasi (detik)</label>
+            <input type="number" step="0.1" id="inspectorDuration" onchange="updateSelectedClip()">
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-secondary" onclick="deleteSelectedClip()" style="background:#d32f2f;">Hapus</button>
+            <button class="btn" onclick="closeInspector()">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio Synthesizer for instant sound effects
+        const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSynthesizedSound(type) {
+            if (AudioCtx.state === 'suspended') AudioCtx.resume();
+            const now = AudioCtx.currentTime;
+
+            if (type === 'Swoosh') {
+                const osc = AudioCtx.createOscillator();
+                const gain = AudioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(AudioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'Pop') {
+                const osc = AudioCtx.createOscillator();
+                const gain = AudioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.connect(gain);
+                gain.connect(AudioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'Coin') {
+                const osc = AudioCtx.createOscillator();
+                const gain = AudioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(987.77, now); // B5
+                osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(AudioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'Camera') {
+                const osc = AudioCtx.createOscillator();
+                const gain = AudioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.connect(gain);
+                gain.connect(AudioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        }
+
+        // State Management
+        let isPlaying = false;
+        let currentTime = 0; // seconds
+        const maxDuration = 15; // 15s timeline
+        const pixelsPerSecond = 100;
+        const trackStartOffset = 90; // width of track label
+        let animationFrameId = null;
+        let selectedClipId = null;
+
+        // Timeline Clips Data Structure
+        let clips = [
+            { id: 1, track: 'video', name: 'Main Speaker Footage', start: 0, duration: 15, text: '' },
+            { id: 2, track: 'motion', name: 'Motion Zoom In (130%)', start: 1.5, duration: 2.0, type: 'zoom' },
+            { id: 3, track: 'text', name: 'TRAFIK TINGGI!', start: 1.5, duration: 2.5, text: 'TRAFIK TINGGI!', style: 'neon' },
+            { id: 4, track: 'sfx', name: 'SFX Swoosh', start: 1.5, duration: 0.5, sfxType: 'Swoosh' },
+            { id: 5, track: 'text', name: 'MONETISASI = 0?', start: 4.5, duration: 2.5, text: 'MONETISASI = 0?', style: 'red' },
+            { id: 6, track: 'sfx', name: 'SFX Pop', start: 4.5, duration: 0.5, sfxType: 'Pop' },
+            { id: 7, track: 'motion', name: 'Flash Pulse Effect', start: 4.5, duration: 0.8, type: 'flash' },
+            { id: 8, track: 'text', name: '90% KENAL AI', start: 8.0, duration: 3.0, text: '90% KENAL AI', style: 'glass' },
+            { id: 9, track: 'sfx', name: 'SFX Coin', start: 8.0, duration: 0.5, sfxType: 'Coin' }
+        ];
+
+        let playedSfxSet = new Set();
+
+        // Canvas Setup
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawCanvas() {
+            // Background speaker frame simulation
+            ctx.fillStyle = '#1e1e2d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Simulated Avatar / Speaker Head
+            ctx.fillStyle = '#3a3a52';
+            ctx.beginPath();
+            ctx.arc(180, 420, 110, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head
+            ctx.fillStyle = '#ffd1b3';
+            ctx.beginPath();
+            ctx.arc(180, 260, 65, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Check Active Motion Effects
+            let currentScale = 1.0;
+            let currentFlash = false;
+            const activeMotions = clips.filter(c => c.track === 'motion' && currentTime >= c.start && currentTime <= (c.start + c.duration));
+            
+            activeMotions.forEach(m => {
+                if (m.type === 'zoom') {
+                    currentScale = 1.25;
+                } else if (m.type === 'flash') {
+                    currentFlash = true;
+                }
+            });
+
+            // Apply Motion Transform
+            if (currentScale !== 1.0) {
+                ctx.save();
+                ctx.translate(180, 320);
+                ctx.scale(currentScale, currentScale);
+                ctx.translate(-180, -320);
+            }
+
+            if (currentFlash) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Check Active Kinetic Texts & Render CapCut Style Overlays
+            const activeTexts = clips.filter(c => c.track === 'text' && currentTime >= c.start && currentTime <= (c.start + c.duration));
+            
+            activeTexts.forEach(t => {
+                ctx.save();
+                ctx.textAlign = 'center';
+
+                if (t.style === 'neon' || t.text.includes('TRAFIK')) {
+                    // Green Kinetic Neon Text
+                    ctx.font = '900 28px "Segoe UI", sans-serif';
+                    ctx.shadowColor = '#00f2fe';
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = '#00f2fe';
+                    ctx.fillText(t.text, 180, 140);
+                } else if (t.style === 'red' || t.text.includes('MONETISASI')) {
+                    // Bold Red Alert Box
+                    ctx.fillStyle = 'rgba(255, 0, 85, 0.9)';
+                    ctx.roundRect(40, 110, 280, 50, 8);
+                    ctx.fill();
+                    ctx.font = 'bold 22px "Segoe UI", sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(t.text, 180, 142);
+                } else {
+                    // Glassmorphism Badge Style (like 90% KENAL AI in video sample)
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.lineWidth = 2;
+                    ctx.roundRect(50, 100, 260, 60, 12);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.font = 'bold 24px "Segoe UI", sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(t.text, 180, 138);
+                }
+
+                ctx.restore();
+            });
+
+            if (currentScale !== 1.0) {
+                ctx.restore();
+            }
+
+            // Check and trigger sound effects at time points
+            const activeSFXs = clips.filter(c => c.track === 'sfx' && currentTime >= c.start && currentTime <= (c.start + c.duration));
+            activeSFXs.forEach(sfx => {
+                if (!playedSfxSet.has(sfx.id) && isPlaying) {
+                    playSynthesizedSound(sfx.sfxType);
+                    playedSfxSet.add(sfx.id);
+                }
+            });
+        }
+
+        // Render Timeline Clips DOM
+        function renderTimeline() {
+            ['video', 'motion', 'text', 'sfx'].forEach(trackName => {
+                const trackEl = document.getElementById(`track-${trackName}`);
+                trackEl.innerHTML = '';
+
+                const trackClips = clips.filter(c => c.track === trackName);
+                trackClips.forEach(clip => {
+                    const clipEl = document.createElement('div');
+                    clipEl.className = `clip ${clip.track} ${clip.id === selectedClipId ? 'active' : ''}`;
+                    clipEl.style.left = `${clip.start * pixelsPerSecond}px`;
+                    clipEl.style.width = `${clip.duration * pixelsPerSecond}px`;
+                    clipEl.innerText = clip.name || clip.text;
+
+                    clipEl.onclick = (e) => {
+                        e.stopPropagation();
+                        openInspector(clip.id);
+                    };
+
+                    trackEl.appendChild(clipEl);
+                });
+            });
+        }
+
+        // Playhead & Controls Logic
+        function updatePlayhead() {
+            const playhead = document.getElementById('playhead');
+            const pos = trackStartOffset + (currentTime * pixelsPerSecond);
+            playhead.style.left = `${pos}px`;
+
+            // Update Time display
+            const sec = Math.floor(currentTime);
+            const ms = Math.floor((currentTime % 1) * 100);
+            document.getElementById('timeDisplay').innerText = 
+                `00:${sec < 10 ? '0' : ''}${sec}.${ms < 10 ? '0' : ''}${ms} / 00:15.00`;
+
+            drawCanvas();
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById('playBtn').innerText = isPlaying ? '⏸' : '▶';
+
+            if (isPlaying) {
+                if (currentTime >= maxDuration) {
+                    currentTime = 0;
+                    playedSfxSet.clear();
+                }
+                let lastTimestamp = performance.now();
+                function step(now) {
+                    if (!isPlaying) return;
+                    const delta = (now - lastTimestamp) / 1000;
+                    lastTimestamp = now;
+                    currentTime += delta;
+
+                    if (currentTime >= maxDuration) {
+                        currentTime = maxDuration;
+                        isPlaying = false;
+                        document.getElementById('playBtn').innerText = '▶';
+                    }
+
+                    updatePlayhead();
+                    if (isPlaying) animationFrameId = requestAnimationFrame(step);
+                }
+                animationFrameId = requestAnimationFrame(step);
+            }
+        }
+
+        function stopVideo() {
+            isPlaying = false;
+            cancelAnimationFrame(animationFrameId);
+            currentTime = 0;
+            playedSfxSet.clear();
+            document.getElementById('playBtn').innerText = '▶';
+            updatePlayhead();
+        }
+
+        function seekTimeline(e) {
+            const rect = document.getElementById('timelineTracks').getBoundingClientRect();
+            const clickX = e.clientX - rect.left - trackStartOffset;
+            if (clickX >= 0) {
+                currentTime = Math.min(maxDuration, Math.max(0, clickX / pixelsPerSecond));
+                playedSfxSet.clear();
+                updatePlayhead();
+            }
+        }
+
+        // AI Automation Prompt Handler
+        function generateAutoEdit() {
+            const promptText = document.getElementById('aiPrompt').value;
+            alert("✨ AI sedang memproses video berdasarkan prompt:\n\"" + promptText + "\"\n\nMenambahkan teks kinetik neon, efek motion zoom, dan SFX secara otomatis!");
+
+            // Dynamically add AI generated clips
+            const newId = Date.now();
+            clips.push(
+                { id: newId + 1, track: 'text', name: '🔥 SERBA OTOMATIS', start: 11.0, duration: 3.0, text: 'SERBA OTOMATIS', style: 'neon' },
+                { id: newId + 2, track: 'sfx', name: 'SFX Camera Flash', start: 11.0, duration: 0.5, sfxType: 'Camera' },
+                { id: newId + 3, track: 'motion', name: 'Motion Zoom In (125%)', start: 11.0, duration: 2.0, type: 'zoom' }
+            );
+
+            renderTimeline();
+            drawCanvas();
+        }
+
+        // Add Manual Sound Effects
+        function addSFXClip(type) {
+            const newId = Date.now();
+            clips.push({
+                id: newId,
+                track: 'sfx',
+                name: `SFX ${type}`,
+                start: currentTime,
+                duration: 0.5,
+                sfxType: type
+            });
+            renderTimeline();
+            playSynthesizedSound(type);
+        }
+
+        function triggerCustomSFXUpload() {
+            document.getElementById('sfxFileInput').click();
+        }
+
+        function handleSFXUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const newId = Date.now();
+                clips.push({
+                    id: newId,
+                    track: 'sfx',
+                    name: `📁 ${file.name}`,
+                    start: currentTime,
+                    duration: 1.0,
+                    sfxType: 'Pop' // fallback synthesizer
+                });
+                renderTimeline();
+                alert(`File SFX "${file.name}" berhasil ditambahkan ke timeline pada detik ${currentTime.toFixed(1)}s!`);
+            }
+        }
+
+        // Add Manual Text Clip
+        function addTextClip() {
+            const newId = Date.now();
+            clips.push({
+                id: newId,
+                track: 'text',
+                name: 'Teks Baru',
+                start: currentTime,
+                duration: 2.5,
+                text: 'TEKS KOLEKTIF',
+                style: 'neon'
+            });
+            renderTimeline();
+            drawCanvas();
+        }
+
+        // Edit Modal / Inspector Functions
+        function openInspector(id) {
+            selectedClipId = id;
+            const clip = clips.find(c => c.id === id);
+            if (!clip) return;
+
+            document.getElementById('inspectorTitle').innerText = `Edit Klip (${clip.track.toUpperCase()})`;
+            document.getElementById('inspectorText').value = clip.text || clip.name;
+            document.getElementById('inspectorStart').value = clip.start;
+            document.getElementById('inspectorDuration').value = clip.duration;
+
+            document.getElementById('textGroup').style.display = (clip.track === 'text') ? 'block' : 'none';
+            document.getElementById('clipInspector').style.display = 'block';
+            renderTimeline();
+        }
+
+        function updateSelectedClip() {
+            const clip = clips.find(c => c.id === selectedClipId);
+            if (!clip) return;
+
+            clip.start = parseFloat(document.getElementById('inspectorStart').value) || 0;
+            clip.duration = parseFloat(document.getElementById('inspectorDuration').value) || 0.5;
+            if (clip.track === 'text') {
+                clip.text = document.getElementById('inspectorText').value;
+                clip.name = clip.text;
+            } else {
+                clip.name = document.getElementById('inspectorText').value;
+            }
+
+            renderTimeline();
+            drawCanvas();
+        }
+
+        function deleteSelectedClip() {
+            clips = clips.filter(c => c.id !== selectedClipId);
+            closeInspector();
+            renderTimeline();
+            drawCanvas();
+        }
+
+        function closeInspector() {
+            selectedClipId = null;
+            document.getElementById('clipInspector').style.display = 'none';
+            renderTimeline();
+        }
+
+        // Polyfill Helper
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                this.beginPath();
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+                return this;
+            };
+        }
+
+        // Initialize App
+        renderTimeline();
+        updatePlayhead();
+    </script>
+</body>
+</html>

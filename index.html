@@ -2,180 +2,378 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapCut AI Web Editor - Automation & Kinetic Effects</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auto Motion AI Studio - Green Edition</title>
     <style>
         :root {
-            --bg-dark: #0d0d12;
-            --panel-bg: #161620;
-            --panel-border: #262636;
-            --accent-blue: #00f2fe;
-            --accent-pink: #ff0055;
-            --accent-purple: #7928ca;
+            --bg-dark: #060a07;
+            --panel-bg: #0d1510;
+            --card-bg: #142018;
+            --panel-border: #1f3326;
+            --accent-green: #00e676;
+            --accent-green-bright: #00ff88;
+            --accent-green-dark: #059669;
+            --accent-green-glow: rgba(0, 230, 118, 0.35);
+            --accent-lime: #a3e635;
             --text-main: #ffffff;
-            --text-muted: #8a8aa0;
+            --text-muted: #83a38f;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         /* Top Header */
         header {
-            height: 50px;
+            height: 52px;
             background: var(--panel-bg);
             border-bottom: 1px solid var(--panel-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .logo {
-            font-weight: bold;
-            font-size: 1.1rem;
+        .logo-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--accent-blue);
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #fff;
         }
 
-        /* Main Workspace Split */
-        .workspace {
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-green-bright), var(--accent-green-dark));
+            border-radius: 8px;
             display: flex;
-            flex: 1;
-            height: calc(100vh - 250px);
-            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #000;
+            font-weight: 900;
         }
 
-        /* Left Sidebar: Controls & AI Prompt */
-        .sidebar {
-            width: 340px;
-            background: var(--panel-bg);
-            border-right: 1px solid var(--panel-border);
+        .badge-tag {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--accent-green-bright);
+            border: 1px solid var(--accent-green);
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        /* Main Container Layout */
+        .app-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            padding: 15px;
-            overflow-y: auto;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .section-box {
-            background: rgba(255, 255, 255, 0.03);
+        /* Hero Banner Section */
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+            background: linear-gradient(to right, #ffffff, var(--accent-green-bright));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        /* Mode Selector Tabs */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .mode-card {
+            background: var(--card-bg);
             border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .section-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-blue);
-            margin-bottom: 10px;
+        .mode-card.active {
+            border-color: var(--accent-green-bright);
+            background: rgba(0, 230, 118, 0.08);
+            box-shadow: 0 0 15px var(--accent-green-glow);
+        }
+
+        .mode-title {
+            font-size: 0.9rem;
+            font-weight: bold;
             display: flex;
             align-items: center;
             gap: 6px;
+            color: var(--accent-green-bright);
         }
 
-        textarea {
-            width: 100%;
-            height: 90px;
-            background: #0a0a0f;
-            border: 1px solid var(--panel-border);
-            border-radius: 6px;
-            color: #fff;
-            padding: 8px;
+        .mode-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Drag & Drop Raw Video Upload Zone */
+        .dropzone-container {
+            background: var(--panel-bg);
+            border: 2px dashed var(--accent-green);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 230, 118, 0.05);
+        }
+
+        .dropzone-container:hover, .dropzone-container.dragover {
+            background: rgba(0, 230, 118, 0.1);
+            border-color: var(--accent-green-bright);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon-circle {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent-green-bright), var(--accent-green-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.5rem;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 6px 20px var(--accent-green-glow);
+        }
+
+        .dropzone-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .dropzone-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .dropzone-hint {
+            font-size: 0.72rem;
+            color: var(--accent-green-bright);
+            background: rgba(0, 230, 118, 0.12);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* Preset Style Selector Grid */
+        .section-header {
             font-size: 0.85rem;
-            resize: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-green-bright);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+        }
+
+        .preset-card {
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-card:hover {
+            border-color: var(--accent-green-bright);
+        }
+
+        .preset-card.selected {
+            border-color: var(--accent-green-bright);
+            box-shadow: 0 0 14px var(--accent-green-glow);
+            background: rgba(0, 230, 118, 0.08);
+        }
+
+        .preset-card .badge-hot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: var(--accent-green-dark);
+            color: #fff;
+            font-size: 0.55rem;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .preset-thumb {
+            height: 65px;
+            background: #08120a;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 1px solid rgba(0,230,118,0.1);
+        }
+
+        .preset-name {
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* Input Controls Layout Grid */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            background: #08100b;
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: white;
+            padding: 10px 12px;
+            font-size: 0.82rem;
             outline: none;
         }
 
-        textarea:focus {
-            border-color: var(--accent-blue);
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent-green-bright);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
         }
 
-        .btn {
-            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+        textarea {
+            height: 70px;
+            resize: none;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, var(--accent-green-bright), var(--accent-green-dark));
             border: none;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: bold;
+            color: #000;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 800;
             cursor: pointer;
-            width: 100%;
-            transition: opacity 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: 0 6px 20px var(--accent-green-glow);
+            transition: opacity 0.2s;
+            width: 100%;
         }
 
-        .btn:hover {
-            opacity: 0.9;
+        .btn-generate:hover {
+            opacity: 0.92;
         }
 
-        .btn-secondary {
-            background: #2a2a3c;
-            color: #fff;
-            margin-top: 6px;
-        }
-
-        .sfx-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .sfx-btn {
-            background: #202030;
+        /* Main Editing Studio Area */
+        .studio-workspace {
+            display: flex;
+            background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            color: #ccc;
-            padding: 8px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-align: center;
+            border-radius: 16px;
+            overflow: hidden;
+            height: 540px;
         }
 
-        .sfx-btn:hover {
-            border-color: var(--accent-blue);
-            color: #fff;
-        }
-
-        /* Center Video Preview */
-        .preview-area {
+        .canvas-area {
             flex: 1;
-            background: #08080c;
+            background: #030805;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: 10px;
+            padding: 15px;
         }
 
-        .player-wrapper {
-            width: 290px;
-            height: 515px;
+        .mobile-player-box {
+            width: 250px;
+            height: 444px;
             background: #000;
             border-radius: 12px;
-            position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 2px solid #222;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            border: 2px solid var(--panel-border);
         }
 
         canvas#videoCanvas {
@@ -184,48 +382,32 @@
             display: block;
         }
 
-        /* Dynamic Kinetic Text Overlay */
-        .overlay-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        /* Multi-track Timeline */
+        .timeline-section {
+            width: 55%;
+            border-left: 1px solid var(--panel-border);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
+            background: #0a110c;
         }
 
-        /* Bottom Timeline Area */
-        .timeline-container {
-            height: 200px;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--panel-border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .timeline-toolbar {
-            height: 40px;
+        .timeline-bar {
+            height: 44px;
             border-bottom: 1px solid var(--panel-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 15px;
-            background: #111118;
+            background: #0e1a12;
         }
 
-        .controls {
+        .play-controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .icon-btn {
+        .btn-icon {
             background: none;
             border: none;
             color: white;
@@ -233,143 +415,142 @@
             cursor: pointer;
         }
 
-        .time-display {
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: var(--accent-blue);
-        }
-
-        .timeline-tracks {
+        .timeline-tracks-box {
             flex: 1;
             position: relative;
             overflow-x: auto;
             overflow-y: hidden;
-            padding-top: 25px;
-            background: #0e0e14;
+            padding-top: 20px;
+            background: #070d09;
         }
 
-        /* Scrubber / Playhead */
-        .playhead {
+        .playhead-line {
             position: absolute;
             top: 0;
             bottom: 0;
             width: 2px;
-            background: var(--accent-pink);
-            z-index: 100;
+            background: var(--accent-green-bright);
+            box-shadow: 0 0 8px var(--accent-green-bright);
+            z-index: 90;
             pointer-events: none;
-            left: 100px; /* Offset start */
+            left: 80px;
         }
 
-        .playhead-head {
-            position: absolute;
-            top: 0;
-            left: -6px;
-            width: 14px;
-            height: 14px;
-            background: var(--accent-pink);
-            clip-path: polygon(0 0, 100% 0, 50% 100%);
-        }
-
-        /* Individual Track Rows */
-        .track {
+        .track-row {
             height: 36px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 230, 118, 0.06);
             position: relative;
-            margin-bottom: 4px;
             display: flex;
             align-items: center;
+            margin-bottom: 4px;
         }
 
-        .track-label {
+        .track-head {
             position: sticky;
             left: 0;
-            width: 90px;
+            width: 80px;
             height: 100%;
-            background: #181824;
-            font-size: 0.75rem;
+            background: #111e15;
+            font-size: 0.68rem;
+            font-weight: bold;
             display: flex;
             align-items: center;
-            padding-left: 10px;
+            padding-left: 8px;
             z-index: 10;
             border-right: 1px solid var(--panel-border);
             color: var(--text-muted);
         }
 
-        .track-content {
+        .track-clips-container {
             position: relative;
             height: 100%;
             flex: 1;
-            width: 2000px; /* Extended timeline length */
+            width: 1500px;
         }
 
-        .clip {
+        .timeline-clip {
             position: absolute;
             height: 28px;
             top: 4px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            border-radius: 5px;
+            font-size: 0.7rem;
             display: flex;
             align-items: center;
             padding: 0 8px;
             color: white;
-            cursor: pointer;
+            cursor: grab;
             overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+            text-overflow: ellipsis;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
         }
 
-        .clip.video { background: #2b5c8f; }
-        .clip.motion { background: #8e24aa; }
-        .clip.text { background: #d81b60; }
-        .clip.sfx { background: #43a047; }
+        /* Green Theme Clips */
+        .timeline-clip.video { background: #143823; border-color: #1f5234; }
+        .timeline-clip.motion { background: #1b5e20; border-color: #2e7d32; }
+        .timeline-clip.text { background: #00796b; border-color: #009688; }
+        .timeline-clip.sfx { background: #33691e; border-color: #558b2f; }
 
-        .clip.active {
-            outline: 2px solid var(--accent-blue);
+        /* Feature Cards Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
 
-        /* Inspector Modal / Panel */
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .feature-card h4 {
+            font-size: 0.8rem;
+            color: var(--accent-green-bright);
+            margin-bottom: 4px;
+        }
+
+        .feature-card p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* Modal Inspector */
         .inspector-modal {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #1c1c28;
-            border: 1px solid var(--panel-border);
-            border-radius: 10px;
-            padding: 20px;
-            width: 320px;
+            background: #111d14;
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 18px;
+            width: 310px;
             z-index: 1000;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
-        .inspector-modal h3 {
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: var(--accent-blue);
-        }
-
-        .form-group {
-            margin-bottom: 10px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 6px;
-            background: #0a0a0f;
-            border: 1px solid var(--panel-border);
-            color: white;
-            border-radius: 4px;
-            font-size: 0.85rem;
+        @media (max-width: 900px) {
+            .studio-workspace {
+                flex-direction: column;
+                height: auto;
+            }
+            .timeline-section {
+                width: 100%;
+                height: 250px;
+                border-left: none;
+                border-top: 1px solid var(--panel-border);
+            }
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
@@ -377,334 +558,390 @@
 
     <!-- Header -->
     <header>
-        <div class="logo">
-            ⚡ CapCut AI Web Studio
+        <div class="logo-brand">
+            <div class="logo-icon">⚡</div>
+            Auto Motion <span class="badge-tag">GREEN AI EDITION</span>
         </div>
-        <div style="font-size:0.85rem; color: var(--text-muted)">
-            Auto Motion • Kinetic Captions • B-Roll SFX Engine
+        <div style="font-size:0.75rem; color: var(--text-muted)">
+            Auto Motion Graphics & Face Tracking
         </div>
     </header>
 
-    <!-- Workspace Main -->
-    <div class="workspace">
+    <!-- Main Container -->
+    <div class="app-container">
 
-        <!-- Left Panel: Prompt & Tools -->
-        <div class="sidebar">
-            <div class="section-box">
-                <div class="section-title">✨ AI Automation Prompt</div>
-                <textarea id="aiPrompt" placeholder="Contoh: Analisis video ini, buatkan efek motion zoom pada kata penting, tambahkan teks kinetik neon 'TRAFIK TINGGI!' dan 'MONETISASI = 0?', sertakan SFX Swoosh dan Pop.">Analisis video, buatkan teks kinetik neon "TRAFIK TINGGI!", "MONETISASI = 0?", "90% KENAL AI", efek zoom-in pada poin penting, serta SFX swoosh saat teks muncul.</textarea>
-                <button class="btn" onclick="generateAutoEdit()">⚡ Generate Edit Otomatis</button>
+        <!-- Hero Section -->
+        <div class="hero-banner">
+            <h1 class="hero-title">Bikin video motion profesional cukup sekali klik.</h1>
+            <p class="hero-subtitle">Upload video kamu ngomong. AI menyusun caption, B-roll, animasi penjelasan, transisi, ganti angle kamera, musik & efek suara otomatis.</p>
+        </div>
+
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <div class="mode-card active" onclick="selectMode(this)">
+                <div class="mode-title">🗣️ Punya video ngomong</div>
+                <div class="mode-desc">Talking head, podcast, review, atau video tutorial.</div>
             </div>
+            <div class="mode-card" onclick="selectMode(this)">
+                <div class="mode-title">🛍️ Tanpa video orang</div>
+                <div class="mode-desc">Isi info produk + foto/video produk kamu.</div>
+            </div>
+        </div>
 
-            <div class="section-box">
-                <div class="section-title">🔊 Sound Effects (SFX) Input</div>
-                <div class="sfx-grid">
-                    <button class="sfx-btn" onclick="addSFXClip('Swoosh')">💨 Swoosh</button>
-                    <button class="sfx-btn" onclick="addSFXClip('Pop')">🎈 Pop Marker</button>
-                    <button class="sfx-btn" onclick="addSFXClip('Coin')">🔔 Cash/Coin</button>
-                    <button class="sfx-btn" onclick="addSFXClip('Camera')">📸 Camera Flash</button>
+        <!-- Drag & Drop Upload Zone for Raw Video -->
+        <div class="dropzone-container" id="dropzone" onclick="document.getElementById('rawVideoInput').click()">
+            <input type="file" id="rawVideoInput" accept="video/*" style="display:none" onchange="handleRawVideoUpload(event)">
+            <div class="upload-icon-circle">⇪</div>
+            <div class="dropzone-title">Tarik & lepas video mentah di sini</div>
+            <div class="dropzone-sub">atau klik untuk memilih • MP4 / MOV / WEBM • ideal &lt; 3 menit</div>
+            <div class="dropzone-hint">💡 Video 1080p/720p di bawah 100MB berjalan paling lancar</div>
+        </div>
+
+        <!-- Preset Motion Style Selector -->
+        <div>
+            <div class="section-header">🎨 Pilih Gaya Motion Graphics</div>
+            <div class="preset-grid">
+                <div class="preset-card selected" onclick="selectPreset(this, 'Emerald Glow')">
+                    <span class="badge-hot">HOT</span>
+                    <div class="preset-thumb">❇️</div>
+                    <div class="preset-name">Emerald Glow</div>
                 </div>
-                <button class="btn btn-secondary" onclick="triggerCustomSFXUpload()">📁 Upload File SFX (.wav/mp3)</button>
-                <input type="file" id="sfxFileInput" style="display:none" accept="audio/*" onchange="handleSFXUpload(event)">
-            </div>
-
-            <div class="section-box">
-                <div class="section-title">🔤 Manual Elements</div>
-                <button class="btn btn-secondary" onclick="addTextClip()">+ Tambah Teks Kinetik</button>
+                <div class="preset-card" onclick="selectPreset(this, 'Neon Cyber Green')">
+                    <span class="badge-hot">HOT</span>
+                    <div class="preset-thumb">🌐</div>
+                    <div class="preset-name">Neon Cyber</div>
+                </div>
+                <div class="preset-card" onclick="selectPreset(this, 'Hijau Tegas')">
+                    <span class="badge-hot">HOT</span>
+                    <div class="preset-thumb">🟢</div>
+                    <div class="preset-name">Hijau Tegas</div>
+                </div>
+                <div class="preset-card" onclick="selectPreset(this, 'Glass Mint')">
+                    <div class="preset-thumb">🍃</div>
+                    <div class="preset-name">Glass Mint</div>
+                </div>
+                <div class="preset-card" onclick="selectPreset(this, 'Clean Green')">
+                    <div class="preset-thumb">🌱</div>
+                    <div class="preset-name">Clean Green</div>
+                </div>
+                <div class="preset-card" onclick="selectPreset(this, 'Matrix Style')">
+                    <div class="preset-thumb">💻</div>
+                    <div class="preset-name">Matrix Style</div>
+                </div>
             </div>
         </div>
 
-        <!-- Center: Video Preview Canvas -->
-        <div class="preview-area">
-            <div class="player-wrapper">
-                <canvas id="videoCanvas" width="360" height="640"></canvas>
+        <!-- Inputs Grid -->
+        <div class="controls-grid">
+            <div class="input-group">
+                <label class="input-label">📝 Konteks (opsional): Produk, Target Penonton, CTA</label>
+                <input type="text" id="contextInput" placeholder="Contoh: Jualan sepatu lokal untuk anak muda. CTA: komen 'MAU'">
+            </div>
+            <div class="input-group">
+                <label class="input-label">🎙️ Naskah VO / Prompt Tambahan</label>
+                <textarea id="scriptInput" placeholder="Tempel naskah VO atau instruksi tambahan agar caption dan b-roll lebih tepat..."></textarea>
             </div>
         </div>
+
+        <!-- Action Button -->
+        <button class="btn-generate" onclick="processAutoMotion()">
+            <span>⚡ Process & Generate Auto Motion (Green Mode)</span>
+        </button>
+
+        <!-- Studio Editor Section -->
+        <div class="section-header" style="margin-top:10px;">🎬 Studio Preview & Timeline Editor</div>
+        <div class="studio-workspace">
+            
+            <!-- Canvas Area -->
+            <div class="canvas-area">
+                <div class="mobile-player-box">
+                    <canvas id="videoCanvas" width="360" height="640"></canvas>
+                </div>
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="timeline-section">
+                <div class="timeline-bar">
+                    <div class="play-controls">
+                        <button class="btn-icon" id="playBtn" onclick="togglePlay()">▶</button>
+                        <button class="btn-icon" onclick="stopVideo()">⏹</button>
+                        <span style="font-family:monospace; font-size:0.8rem; color:var(--accent-green-bright)" id="timeDisplay">00:00.00 / 00:15.00</span>
+                    </div>
+                    <div style="font-size:0.7rem; color:var(--text-muted)">
+                        Klik klip untuk mengedit teks/durasi
+                    </div>
+                </div>
+
+                <div class="timeline-tracks-box" id="timelineTracks" onclick="seekTimeline(event)">
+                    <div class="playhead-line" id="playhead"></div>
+
+                    <div class="track-row">
+                        <div class="track-head">🎬 Video</div>
+                        <div class="track-clips-container" id="track-video"></div>
+                    </div>
+                    <div class="track-row">
+                        <div class="track-head">⚡ Motion</div>
+                        <div class="track-clips-container" id="track-motion"></div>
+                    </div>
+                    <div class="track-row">
+                        <div class="track-head">🔤 Text</div>
+                        <div class="track-clips-container" id="track-text"></div>
+                    </div>
+                    <div class="track-row">
+                        <div class="track-head">🔊 SFX</div>
+                        <div class="track-clips-container" id="track-sfx"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Guide Cards -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <h4>Caption & animasi teks</h4>
+                <p>Kata kunci besar berwarna hijau neon, gaya animasi teks, sinkron per kata.</p>
+            </div>
+            <div class="feature-card">
+                <h4>B-roll & ganti latar</h4>
+                <p>Foto/video kamu, gambar AI, latar di belakang orang, mockup HP.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Animasi & transisi</h4>
+                <p>Langkah, grafik, perbandingan, spotlight produk, transisi otomatis.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Musik & render MP4</h4>
+                <p>Musik latar original + efek suara otomatis, render langsung di browser.</p>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Bottom Panel: Multi-track Timeline -->
-    <div class="timeline-container">
-        <div class="timeline-toolbar">
-            <div class="controls">
-                <button class="icon-btn" id="playBtn" onclick="togglePlay()">▶</button>
-                <button class="icon-btn" onclick="stopVideo()">⏹</button>
-                <span class="time-display" id="timeDisplay">00:00.00 / 00:15.00</span>
+    <!-- Inspector Modal -->
+    <div class="inspector-modal" id="inspectorModal">
+        <h3 style="font-size:0.9rem; color:var(--accent-green-bright); margin-bottom:10px;">Edit Klip Timeline</h3>
+        <div style="margin-bottom:8px;">
+            <label style="font-size:0.7rem; color:var(--text-muted)">Konten / Teks</label>
+            <input type="text" id="inspectorText" onchange="saveClipEdit()">
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <div style="flex:1">
+                <label style="font-size:0.7rem; color:var(--text-muted)">Mulai (s)</label>
+                <input type="number" step="0.1" id="inspectorStart" onchange="saveClipEdit()">
             </div>
-            <div style="font-size:0.75rem; color:var(--text-muted)">
-                Klik klip pada timeline untuk mengedit teks/durasi/efek
+            <div style="flex:1">
+                <label style="font-size:0.7rem; color:var(--text-muted)">Durasi (s)</label>
+                <input type="number" step="0.1" id="inspectorDuration" onchange="saveClipEdit()">
             </div>
         </div>
-
-        <div class="timeline-tracks" id="timelineTracks" onclick="seekTimeline(event)">
-            <div class="playhead" id="playhead">
-                <div class="playhead-head"></div>
-            </div>
-
-            <!-- Track 1: Video Footage -->
-            <div class="track">
-                <div class="track-label">🎬 Video</div>
-                <div class="track-content" id="track-video"></div>
-            </div>
-
-            <!-- Track 2: Motion Effects -->
-            <div class="track">
-                <div class="track-label">⚡ Motion</div>
-                <div class="track-content" id="track-motion"></div>
-            </div>
-
-            <!-- Track 3: Text & Captions -->
-            <div class="track">
-                <div class="track-label">🔤 Text/B-Roll</div>
-                <div class="track-content" id="track-text"></div>
-            </div>
-
-            <!-- Track 4: Audio & SFX -->
-            <div class="track">
-                <div class="track-label">🔊 SFX</div>
-                <div class="track-content" id="track-sfx"></div>
-            </div>
-        </div>
+        <button class="btn-generate" onclick="closeInspector()" style="padding:8px; font-size:0.8rem;">Tutup</button>
     </div>
 
-    <!-- Property Modal for Editing Clips -->
-    <div class="inspector-modal" id="clipInspector">
-        <h3 id="inspectorTitle">Edit Klip</h3>
-        <div class="form-group" id="textGroup">
-            <label>Konten Teks</label>
-            <input type="text" id="inspectorText" onchange="updateSelectedClip()">
-        </div>
-        <div class="form-group">
-            <label>Waktu Mulai (detik)</label>
-            <input type="number" step="0.1" id="inspectorStart" onchange="updateSelectedClip()">
-        </div>
-        <div class="form-group">
-            <label>Durasi (detik)</label>
-            <input type="number" step="0.1" id="inspectorDuration" onchange="updateSelectedClip()">
-        </div>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn btn-secondary" onclick="deleteSelectedClip()" style="background:#d32f2f;">Hapus</button>
-            <button class="btn" onclick="closeInspector()">Tutup</button>
-        </div>
-    </div>
+    <!-- Hidden Raw Video Element -->
+    <video id="rawVideoElement" style="display:none" playsinline muted loop></video>
 
     <script>
-        // Web Audio Synthesizer for instant sound effects
+        // Web Audio Synthesizer (Green Audio Engine)
         const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playSynthesizedSound(type) {
+        function playSFX(type) {
             if (AudioCtx.state === 'suspended') AudioCtx.resume();
             const now = AudioCtx.currentTime;
+            const osc = AudioCtx.createOscillator();
+            const gain = AudioCtx.createGain();
 
             if (type === 'Swoosh') {
-                const osc = AudioCtx.createOscillator();
-                const gain = AudioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                osc.connect(gain);
-                gain.connect(AudioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.25);
-            } else if (type === 'Pop') {
-                const osc = AudioCtx.createOscillator();
-                const gain = AudioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.connect(gain);
-                gain.connect(AudioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            } else if (type === 'Coin') {
-                const osc = AudioCtx.createOscillator();
-                const gain = AudioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(987.77, now); // B5
-                osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.connect(gain);
-                gain.connect(AudioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'Camera') {
-                const osc = AudioCtx.createOscillator();
-                const gain = AudioCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, now);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                osc.connect(gain);
-                gain.connect(AudioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.05);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(420, now);
+                osc.frequency.exponentialRampToValueAtTime(75, now + 0.2);
+                gain.gain.setValueAtTime(0.35, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            } else {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(680, now);
+                osc.frequency.exponentialRampToValueAtTime(140, now + 0.08);
+                gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
             }
+            osc.connect(gain); gain.connect(AudioCtx.destination);
+            osc.start(now); osc.stop(now + 0.2);
         }
 
         // State Management
         let isPlaying = false;
-        let currentTime = 0; // seconds
-        const maxDuration = 15; // 15s timeline
-        const pixelsPerSecond = 100;
-        const trackStartOffset = 90; // width of track label
-        let animationFrameId = null;
+        let currentTime = 0;
+        const maxDuration = 15;
+        const pixelsPerSecond = 70;
+        const trackStartOffset = 80;
+        let selectedPreset = 'Emerald Glow';
+        let loadedRawVideo = null;
         let selectedClipId = null;
 
-        // Timeline Clips Data Structure
+        // Timeline Data Structure
         let clips = [
-            { id: 1, track: 'video', name: 'Main Speaker Footage', start: 0, duration: 15, text: '' },
-            { id: 2, track: 'motion', name: 'Motion Zoom In (130%)', start: 1.5, duration: 2.0, type: 'zoom' },
-            { id: 3, track: 'text', name: 'TRAFIK TINGGI!', start: 1.5, duration: 2.5, text: 'TRAFIK TINGGI!', style: 'neon' },
+            { id: 1, track: 'video', name: 'Raw Video Footage', start: 0, duration: 15 },
+            { id: 2, track: 'motion', name: 'Face Motion Zoom', start: 1.5, duration: 2.5, type: 'zoom' },
+            { id: 3, track: 'text', name: '❇️ TRAFIK TINGGI!', start: 1.5, duration: 2.5, text: 'TRAFIK TINGGI!', followFace: true },
             { id: 4, track: 'sfx', name: 'SFX Swoosh', start: 1.5, duration: 0.5, sfxType: 'Swoosh' },
-            { id: 5, track: 'text', name: 'MONETISASI = 0?', start: 4.5, duration: 2.5, text: 'MONETISASI = 0?', style: 'red' },
-            { id: 6, track: 'sfx', name: 'SFX Pop', start: 4.5, duration: 0.5, sfxType: 'Pop' },
-            { id: 7, track: 'motion', name: 'Flash Pulse Effect', start: 4.5, duration: 0.8, type: 'flash' },
-            { id: 8, track: 'text', name: '90% KENAL AI', start: 8.0, duration: 3.0, text: '90% KENAL AI', style: 'glass' },
-            { id: 9, track: 'sfx', name: 'SFX Coin', start: 8.0, duration: 0.5, sfxType: 'Coin' }
+            { id: 5, track: 'text', name: '🟢 MONETISASI = 0?', start: 5.0, duration: 3.0, text: 'MONETISASI = 0?', followFace: true },
+            { id: 6, track: 'sfx', name: 'SFX Pop', start: 5.0, duration: 0.5, sfxType: 'Pop' }
         ];
 
         let playedSfxSet = new Set();
-
-        // Canvas Setup
         const canvas = document.getElementById('videoCanvas');
         const ctx = canvas.getContext('2d');
+        const rawVideoEl = document.getElementById('rawVideoElement');
 
+        // Handle Raw Video Upload
+        function handleRawVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const videoURL = URL.createObjectURL(file);
+                rawVideoEl.src = videoURL;
+                rawVideoEl.play();
+                loadedRawVideo = file;
+                
+                document.querySelector('.dropzone-title').innerText = `✅ Video Terpasang: ${file.name}`;
+                document.querySelector('.dropzone-sub').innerText = `Ukuran: ${(file.size / (1024*1024)).toFixed(1)} MB • Siap diproses!`;
+                drawCanvas();
+            }
+        }
+
+        // Drag and Drop Events
+        const dropzone = document.getElementById('dropzone');
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                document.getElementById('rawVideoInput').files = e.dataTransfer.files;
+                handleRawVideoUpload({ target: { files: e.dataTransfer.files } });
+            }
+        });
+
+        // UI Selectors
+        function selectMode(element) {
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function selectPreset(element, name) {
+            document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedPreset = name;
+        }
+
+        // Process Motion Logic
+        function processAutoMotion() {
+            const contextText = document.getElementById('contextInput').value || 'Promosi Video Mentah';
+            alert(`❇️ Green AI Engine sedang menyusun motion graphics!\n\nPreset: ${selectedPreset}\nKonteks: ${contextText}`);
+            
+            const newId = Date.now();
+            clips.push(
+                { id: newId + 1, track: 'text', name: '🌱 AI GREEN AUTO', start: 9.0, duration: 3.0, text: 'VIRAL HIJAU NEON!', followFace: true },
+                { id: newId + 2, track: 'sfx', name: 'SFX Swoosh', start: 9.0, duration: 0.5, sfxType: 'Swoosh' },
+                { id: newId + 3, track: 'motion', name: 'Motion Zoom', start: 9.0, duration: 2.0, type: 'zoom' }
+            );
+
+            renderTimeline();
+            drawCanvas();
+        }
+
+        // Render Canvas Frame
         function drawCanvas() {
-            // Background speaker frame simulation
-            ctx.fillStyle = '#1e1e2d';
+            ctx.fillStyle = '#050a06';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Simulated Avatar / Speaker Head
-            ctx.fillStyle = '#3a3a52';
-            ctx.beginPath();
-            ctx.arc(180, 420, 110, 0, Math.PI * 2);
-            ctx.fill();
+            const faceX = 180 + Math.sin(currentTime * 2.5) * 30;
+            const faceY = 240 + Math.cos(currentTime * 1.5) * 15;
 
-            // Head
-            ctx.fillStyle = '#ffd1b3';
-            ctx.beginPath();
-            ctx.arc(180, 260, 65, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Check Active Motion Effects
+            // Check Motion Zoom
             let currentScale = 1.0;
-            let currentFlash = false;
             const activeMotions = clips.filter(c => c.track === 'motion' && currentTime >= c.start && currentTime <= (c.start + c.duration));
-            
-            activeMotions.forEach(m => {
-                if (m.type === 'zoom') {
-                    currentScale = 1.25;
-                } else if (m.type === 'flash') {
-                    currentFlash = true;
-                }
-            });
+            if (activeMotions.length > 0) currentScale = 1.25;
 
-            // Apply Motion Transform
             if (currentScale !== 1.0) {
                 ctx.save();
-                ctx.translate(180, 320);
+                ctx.translate(faceX, faceY);
                 ctx.scale(currentScale, currentScale);
-                ctx.translate(-180, -320);
+                ctx.translate(-faceX, -faceY);
             }
 
-            if (currentFlash) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Draw Raw Video Frame OR Simulated Face Avatar
+            if (rawVideoEl.readyState >= 2) {
+                ctx.drawImage(rawVideoEl, 0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#14291c';
+                ctx.beginPath();
+                ctx.arc(faceX, faceY + 150, 100, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffcfb3';
+                ctx.beginPath();
+                ctx.arc(faceX, faceY, 60, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            // Check Active Kinetic Texts & Render CapCut Style Overlays
+            // Green Target Marker Box
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(faceX - 70, faceY - 70, 140, 140);
+
+            // Render Active Green Text Overlay
             const activeTexts = clips.filter(c => c.track === 'text' && currentTime >= c.start && currentTime <= (c.start + c.duration));
-            
             activeTexts.forEach(t => {
                 ctx.save();
                 ctx.textAlign = 'center';
+                const rx = t.followFace ? faceX : 180;
+                const ry = t.followFace ? faceY - 85 : 140;
 
-                if (t.style === 'neon' || t.text.includes('TRAFIK')) {
-                    // Green Kinetic Neon Text
-                    ctx.font = '900 28px "Segoe UI", sans-serif';
-                    ctx.shadowColor = '#00f2fe';
-                    ctx.shadowBlur = 15;
-                    ctx.fillStyle = '#00f2fe';
-                    ctx.fillText(t.text, 180, 140);
-                } else if (t.style === 'red' || t.text.includes('MONETISASI')) {
-                    // Bold Red Alert Box
-                    ctx.fillStyle = 'rgba(255, 0, 85, 0.9)';
-                    ctx.roundRect(40, 110, 280, 50, 8);
-                    ctx.fill();
-                    ctx.font = 'bold 22px "Segoe UI", sans-serif';
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(t.text, 180, 142);
-                } else {
-                    // Glassmorphism Badge Style (like 90% KENAL AI in video sample)
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-                    ctx.lineWidth = 2;
-                    ctx.roundRect(50, 100, 260, 60, 12);
-                    ctx.fill();
-                    ctx.stroke();
+                // Green Cyber Badge Background
+                ctx.fillStyle = 'rgba(0, 230, 118, 0.95)';
+                ctx.shadowColor = '#00ff88';
+                ctx.shadowBlur = 12;
+                ctx.roundRect(rx - 110, ry - 20, 220, 40, 8);
+                ctx.fill();
 
-                    ctx.font = 'bold 24px "Segoe UI", sans-serif';
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(t.text, 180, 138);
-                }
-
+                ctx.font = '900 18px "Segoe UI", sans-serif';
+                ctx.fillStyle = '#05140b';
+                ctx.fillText(t.text, rx, ry + 6);
                 ctx.restore();
             });
 
-            if (currentScale !== 1.0) {
-                ctx.restore();
-            }
+            if (currentScale !== 1.0) ctx.restore();
 
-            // Check and trigger sound effects at time points
+            // Audio Triggering
             const activeSFXs = clips.filter(c => c.track === 'sfx' && currentTime >= c.start && currentTime <= (c.start + c.duration));
-            activeSFXs.forEach(sfx => {
-                if (!playedSfxSet.has(sfx.id) && isPlaying) {
-                    playSynthesizedSound(sfx.sfxType);
-                    playedSfxSet.add(sfx.id);
+            activeSFXs.forEach(s => {
+                if (!playedSfxSet.has(s.id) && isPlaying) {
+                    playSFX(s.sfxType);
+                    playedSfxSet.add(s.id);
                 }
             });
         }
 
-        // Render Timeline Clips DOM
+        // Render Multi-Track Timeline
         function renderTimeline() {
             ['video', 'motion', 'text', 'sfx'].forEach(trackName => {
                 const trackEl = document.getElementById(`track-${trackName}`);
                 trackEl.innerHTML = '';
-
                 const trackClips = clips.filter(c => c.track === trackName);
+
                 trackClips.forEach(clip => {
                     const clipEl = document.createElement('div');
-                    clipEl.className = `clip ${clip.track} ${clip.id === selectedClipId ? 'active' : ''}`;
+                    clipEl.className = `timeline-clip ${clip.track}`;
                     clipEl.style.left = `${clip.start * pixelsPerSecond}px`;
                     clipEl.style.width = `${clip.duration * pixelsPerSecond}px`;
-                    clipEl.innerText = clip.name || clip.text;
-
-                    clipEl.onclick = (e) => {
-                        e.stopPropagation();
-                        openInspector(clip.id);
-                    };
-
+                    clipEl.innerText = clip.text || clip.name;
+                    clipEl.onclick = (e) => { e.stopPropagation(); openInspector(clip.id); };
                     trackEl.appendChild(clipEl);
                 });
             });
         }
 
-        // Playhead & Controls Logic
+        // Player Controls
         function updatePlayhead() {
-            const playhead = document.getElementById('playhead');
-            const pos = trackStartOffset + (currentTime * pixelsPerSecond);
-            playhead.style.left = `${pos}px`;
-
-            // Update Time display
+            document.getElementById('playhead').style.left = `${trackStartOffset + (currentTime * pixelsPerSecond)}px`;
             const sec = Math.floor(currentTime);
             const ms = Math.floor((currentTime % 1) * 100);
             document.getElementById('timeDisplay').innerText = 
                 `00:${sec < 10 ? '0' : ''}${sec}.${ms < 10 ? '0' : ''}${ms} / 00:15.00`;
-
             drawCanvas();
         }
 
@@ -713,35 +950,30 @@
             document.getElementById('playBtn').innerText = isPlaying ? '⏸' : '▶';
 
             if (isPlaying) {
-                if (currentTime >= maxDuration) {
-                    currentTime = 0;
-                    playedSfxSet.clear();
-                }
-                let lastTimestamp = performance.now();
-                function step(now) {
+                if (rawVideoEl.src) rawVideoEl.play();
+                let lastTime = performance.now();
+                function loop(now) {
                     if (!isPlaying) return;
-                    const delta = (now - lastTimestamp) / 1000;
-                    lastTimestamp = now;
-                    currentTime += delta;
-
+                    currentTime += (now - lastTime) / 1000;
+                    lastTime = now;
                     if (currentTime >= maxDuration) {
-                        currentTime = maxDuration;
-                        isPlaying = false;
-                        document.getElementById('playBtn').innerText = '▶';
+                        currentTime = 0;
+                        playedSfxSet.clear();
                     }
-
                     updatePlayhead();
-                    if (isPlaying) animationFrameId = requestAnimationFrame(step);
+                    requestAnimationFrame(loop);
                 }
-                animationFrameId = requestAnimationFrame(step);
+                requestAnimationFrame(loop);
+            } else {
+                if (rawVideoEl.src) rawVideoEl.pause();
             }
         }
 
         function stopVideo() {
             isPlaying = false;
-            cancelAnimationFrame(animationFrameId);
             currentTime = 0;
             playedSfxSet.clear();
+            if (rawVideoEl.src) rawVideoEl.pause();
             document.getElementById('playBtn').innerText = '▶';
             updatePlayhead();
         }
@@ -751,100 +983,26 @@
             const clickX = e.clientX - rect.left - trackStartOffset;
             if (clickX >= 0) {
                 currentTime = Math.min(maxDuration, Math.max(0, clickX / pixelsPerSecond));
+                if (rawVideoEl.duration) rawVideoEl.currentTime = currentTime;
                 playedSfxSet.clear();
                 updatePlayhead();
             }
         }
 
-        // AI Automation Prompt Handler
-        function generateAutoEdit() {
-            const promptText = document.getElementById('aiPrompt').value;
-            alert("✨ AI sedang memproses video berdasarkan prompt:\n\"" + promptText + "\"\n\nMenambahkan teks kinetik neon, efek motion zoom, dan SFX secara otomatis!");
-
-            // Dynamically add AI generated clips
-            const newId = Date.now();
-            clips.push(
-                { id: newId + 1, track: 'text', name: '🔥 SERBA OTOMATIS', start: 11.0, duration: 3.0, text: 'SERBA OTOMATIS', style: 'neon' },
-                { id: newId + 2, track: 'sfx', name: 'SFX Camera Flash', start: 11.0, duration: 0.5, sfxType: 'Camera' },
-                { id: newId + 3, track: 'motion', name: 'Motion Zoom In (125%)', start: 11.0, duration: 2.0, type: 'zoom' }
-            );
-
-            renderTimeline();
-            drawCanvas();
-        }
-
-        // Add Manual Sound Effects
-        function addSFXClip(type) {
-            const newId = Date.now();
-            clips.push({
-                id: newId,
-                track: 'sfx',
-                name: `SFX ${type}`,
-                start: currentTime,
-                duration: 0.5,
-                sfxType: type
-            });
-            renderTimeline();
-            playSynthesizedSound(type);
-        }
-
-        function triggerCustomSFXUpload() {
-            document.getElementById('sfxFileInput').click();
-        }
-
-        function handleSFXUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const newId = Date.now();
-                clips.push({
-                    id: newId,
-                    track: 'sfx',
-                    name: `📁 ${file.name}`,
-                    start: currentTime,
-                    duration: 1.0,
-                    sfxType: 'Pop' // fallback synthesizer
-                });
-                renderTimeline();
-                alert(`File SFX "${file.name}" berhasil ditambahkan ke timeline pada detik ${currentTime.toFixed(1)}s!`);
-            }
-        }
-
-        // Add Manual Text Clip
-        function addTextClip() {
-            const newId = Date.now();
-            clips.push({
-                id: newId,
-                track: 'text',
-                name: 'Teks Baru',
-                start: currentTime,
-                duration: 2.5,
-                text: 'TEKS KOLEKTIF',
-                style: 'neon'
-            });
-            renderTimeline();
-            drawCanvas();
-        }
-
-        // Edit Modal / Inspector Functions
+        // Inspector Modal
         function openInspector(id) {
             selectedClipId = id;
             const clip = clips.find(c => c.id === id);
             if (!clip) return;
-
-            document.getElementById('inspectorTitle').innerText = `Edit Klip (${clip.track.toUpperCase()})`;
             document.getElementById('inspectorText').value = clip.text || clip.name;
             document.getElementById('inspectorStart').value = clip.start;
             document.getElementById('inspectorDuration').value = clip.duration;
-
-            document.getElementById('textGroup').style.display = (clip.track === 'text') ? 'block' : 'none';
-            document.getElementById('clipInspector').style.display = 'block';
-            renderTimeline();
+            document.getElementById('inspectorModal').style.display = 'block';
         }
 
-        function updateSelectedClip() {
+        function saveClipEdit() {
             const clip = clips.find(c => c.id === selectedClipId);
             if (!clip) return;
-
             clip.start = parseFloat(document.getElementById('inspectorStart').value) || 0;
             clip.duration = parseFloat(document.getElementById('inspectorDuration').value) || 0.5;
             if (clip.track === 'text') {
@@ -853,25 +1011,15 @@
             } else {
                 clip.name = document.getElementById('inspectorText').value;
             }
-
-            renderTimeline();
-            drawCanvas();
-        }
-
-        function deleteSelectedClip() {
-            clips = clips.filter(c => c.id !== selectedClipId);
-            closeInspector();
             renderTimeline();
             drawCanvas();
         }
 
         function closeInspector() {
-            selectedClipId = null;
-            document.getElementById('clipInspector').style.display = 'none';
-            renderTimeline();
+            document.getElementById('inspectorModal').style.display = 'none';
         }
 
-        // Polyfill Helper
+        // Canvas RoundRect Polyfill
         if (!CanvasRenderingContext2D.prototype.roundRect) {
             CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 this.beginPath();
@@ -885,7 +1033,7 @@
             };
         }
 
-        // Initialize App
+        // Init
         renderTimeline();
         updatePlayhead();
     </script>
